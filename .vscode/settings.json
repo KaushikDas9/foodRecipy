@@ -1,0 +1,9 @@
+{
+    "dart.flutterGenerateLocalizationsOnSave": "allIfDirty",
+    "dart.flutterHotReloadOnSave": "allIfDirty",
+    "dart.hotReloadOnSave": "allIfDirty",
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 500,
+    "dart.flutterScreenshotPath": null,
+    "dart.previewHotReloadOnSaveWatcher": true
+}
