@@ -14,9 +14,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  // static final api_key = dotenv.env['api_key'];
-  String api_key = dotenv.get("api_key", fallback: "dfsg");
-
   int count = 0;
   List<RecipieModel> recipiList = <RecipieModel>[];
   FirebaseAuth _auth = FirebaseAuth.instance;
