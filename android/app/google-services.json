@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "717938910191",
+    "firebase_url": "https://foodrecipibykd9-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "foodrecipibykd9",
+    "storage_bucket": "foodrecipibykd9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:717938910191:android:e91d85520f2316cf0ccc1a",
+        "android_client_info": {
+          "package_name": "com.example.untitled"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "717938910191-vha0oa36nmdv6nomq0o3pnl9tsnp8e7a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmf_rEfiulbykGJ-cMMG_YPgoIJA4RcLQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "717938910191-vha0oa36nmdv6nomq0o3pnl9tsnp8e7a.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "717938910191-m37lhp9l9hl3jpqrs8q1uibiuba2j17t.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.untitled.RunnerTests"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

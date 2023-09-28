@@ -1,34 +1,28 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:sign_in_button/sign_in_button.dart';
-import 'package:untitled/utils_.dart';
 
-import 'FireBase_work/LogIn.dart';
+import 'FireBase_work/SignUp.dart';
 
-bool loginCheak = false;
-
-class loginPage extends StatefulWidget {
-  const loginPage({super.key});
+class signUp extends StatefulWidget {
+  const signUp({super.key});
 
   @override
-  State<loginPage> createState() => _loginPageState();
+  State<signUp> createState() => _signUpState();
 }
 
-GoogleSignIn _googleSignIn = GoogleSignIn();
-FirebaseAuth _auth = FirebaseAuth.instance;
-
-class _loginPageState extends State<loginPage> {
-  final _formKey = GlobalKey<FormState>();
+class _signUpState extends State<signUp> {
+  bool signUpProcessbar = false;
   TextEditingController _email = TextEditingController();
   TextEditingController _passWord = TextEditingController();
+  FirebaseAuth _auth = FirebaseAuth.instance;
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('Login'),
+          title: const Text('Sign up'),
         ),
         body: SingleChildScrollView(
           child: Container(
@@ -67,6 +61,7 @@ class _loginPageState extends State<loginPage> {
                               left: MediaQuery.of(context).size.width * .05,
                               right: MediaQuery.of(context).size.width * .05),
                           child: TextFormField(
+                            controller: _email,
                             decoration: const InputDecoration(
                               prefixIcon: Icon(Icons.email_outlined),
                               hintText: "Username",
@@ -77,7 +72,6 @@ class _loginPageState extends State<loginPage> {
                               }
                               return null;
                             },
-                            controller: _email,
                           ),
                         ),
                         Padding(
@@ -85,11 +79,11 @@ class _loginPageState extends State<loginPage> {
                               left: MediaQuery.of(context).size.width * .05,
                               right: MediaQuery.of(context).size.width * .05),
                           child: TextFormField(
+                            controller: _passWord,
                             decoration: const InputDecoration(
                               prefixIcon: Icon(Icons.lock_outline),
                               hintText: "Password",
                             ),
-                            controller: _passWord,
                             obscureText: true,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
@@ -104,79 +98,35 @@ class _loginPageState extends State<loginPage> {
                           child: ElevatedButton(
                               onPressed: () {
                                 if (_formKey.currentState!.validate()) {
-                                  loginCheak = LogIn().LogIn_(
-                                      _email.text.toString(),
-                                      _passWord.text.toString(),
-                                      context);
+                                  SignUp().signUp_(_email.text.toString(),
+                                      _passWord.text.toString(), context);
 
-                                  print(_email.text.toString());
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text('Processing Data')),
+                                  );
                                 }
                               },
-                              child: loginCheak
-                                  ? const SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(),
-                                    )
-                                  : const Text("LOG IN")),
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.only(top: 15),
-                          child: Text("Forgot Password?"),
+                              child: const Text("Sign Up")),
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Text("Don't have an Account ?"),
+                            Text("Already have an Account ?"),
                             CupertinoButton(
-                                child: const Text("Sign up"),
+                                child: const Text("Log in"),
                                 onPressed: () {
-                                  Navigator.pushNamed(context, "/signUpPage");
-                                }),
+                                  Navigator.popAndPushNamed(
+                                      context, "/logInPage");
+                                })
                           ],
                         )
                       ],
-                    )),
+                    ))
                 //Form Ses
-                const Text(
-                  "Or",
-                  style: TextStyle(fontSize: 15),
-                ),
-                const Padding(padding: EdgeInsets.only(top: 10)),
-                SignInButton(
-                  Buttons.google,
-                  onPressed: () {
-                    sign_in_with_google()
-                        .then((value) => {
-                              Navigator.pushNamedAndRemoveUntil(
-                                  context, "/afterLogIn", (route) => false)
-                            })
-                        .onError((error, stackTrace) =>
-                            {Utils_().fireToast(error.toString())});
-                  },
-                ),
               ],
             ),
           ),
         ));
-  }
-
-  Future<User?> sign_in_with_google() async {
-    GoogleSignInAccount? googleSignInAccount = await _googleSignIn.signIn();
-    GoogleSignInAuthentication? googleSignInAuthentication =
-        await googleSignInAccount?.authentication;
-
-    AuthCredential googleAuthCredential = await GoogleAuthProvider.credential(
-        accessToken: googleSignInAuthentication?.accessToken,
-        idToken: googleSignInAuthentication?.idToken);
-
-    UserCredential userCredential =
-        await _auth.signInWithCredential(googleAuthCredential);
-    User? user = userCredential.user;
-
-    assert(!user!.isAnonymous);
-    assert(user?.getIdToken() != null);
-
-    return user;
   }
 }

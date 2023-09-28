@@ -1,9 +1,10 @@
 import 'dart:convert';
-import 'dart:developer';
-import 'package:untitled/model.dart';
-import 'package:flutter/foundation.dart';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:untitled/model.dart';
+
 class Home extends StatefulWidget {
   const Home({super.key});
 
@@ -12,124 +13,230 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-
+  int count = 0;
   List<RecipieModel> recipiList = <RecipieModel>[];
+  FirebaseAuth _auth = FirebaseAuth.instance;
+  TextEditingController foodname = TextEditingController();
 
-  void getData( String foodName)  async {
-    String url = "https://api.edamam.com/search?q=$foodName&app_id=86af4909&app_key=d204e8dc294ab499bef1fbfa892b4561";
-      var response = await get(Uri.parse(url));
-      var respondata = json.decode(response.body);
-
-      respondata["hits"].forEach( ( element ) {
-
-        RecipieModel recipieModel =  new RecipieModel();
-        recipieModel = RecipieModel.fromMap(element["recipe"]);
-        recipiList.add(recipieModel);
-
-      });
-
-      
-  }
-
-  String foodName="";
-
-  @override
-  void setState(VoidCallback fn) {
-    // TODO: implement setState
-    super.setState(fn);
-    print(foodName);
-  }
   @override
   Widget build(BuildContext context) {
+    Future<void> getData(String foodName) async {
+      recipiList.clear();
+      try {
+        String url =
+            await "https://api.edamam.com/search?q=$foodName&app_id=86af4909&app_key=d204e8dc294ab499bef1fbfa892b4561";
+        var response = await get(Uri.parse(url));
+        var respondata = json.decode(response.body);
 
-    return  Scaffold(
-      appBar: AppBar(title: const Text("Home"),),
+        print(respondata.toString());
+
+        setState(() {
+          print("set state1");
+          respondata["hits"].forEach((element) {
+            RecipieModel recipieModel = new RecipieModel();
+            recipieModel = RecipieModel.fromMap(element["recipe"]);
+            recipiList.add(recipieModel);
+          });
+        });
+      } catch (e) {
+        print(e.toString());
+      }
+    }
+
+    @override
+    void initState() {
+      // TODO: implement initState
+      super.initState();
+      // getRecipes("Ladoo");
+    }
+
+    print("SetState2");
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Home"),
+        actions: [
+          IconButton(
+            onPressed: () {
+              _auth.signOut();
+              Navigator.pushNamedAndRemoveUntil(
+                  context, "/logInPage", (Route route) => false);
+            },
+            icon: Icon(Icons.logout),
+          )
+        ],
+      ),
       resizeToAvoidBottomInset: false,
-      body: Stack(
-          children:[
-            Container(
+      body: Stack(children: [
+        Container(
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
             decoration: const BoxDecoration(color: Color(0xffFB7901)),
+            child: SingleChildScrollView(
               child: Column(
-                 children: [
-
-                       //Srearch bar suru
-                 Container(
-                    width: MediaQuery.of(context).size.width * .9 ,
-                     height: MediaQuery.of(context).size.height * .07,
-                     margin: const EdgeInsets.fromLTRB(15, 20, 15, 0),
-                    decoration:  BoxDecoration(
-                     borderRadius: BorderRadius.circular(35),
-                    color: Colors.white24),
-                       child:   Padding(
-                          padding: EdgeInsets.only(left: 15),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    GestureDetector(
-                                          child: const Icon(Icons.search ,color: Colors.white70),
-                                          onTap: () {
-                                            setState(() {getData(foodName);});
-                                          } ,
-                               ),
-                                SizedBox(
-                                        width: MediaQuery.of(context).size.width * .75,
-                                       height: MediaQuery.of(context).size.height * .06,
-
-                                     child: Padding(
-                                       padding: const EdgeInsets.only(left:5),
-                                       child: TextField(style: const TextStyle(color: Colors.white,fontFamily: "pop_medium"),
-                                           cursorColor:Colors.white70 ,
-                                           textInputAction: TextInputAction.search,
-                                           onSubmitted: (value) {
-                                        foodName=value;
-                                           print(" search  $foodName");
-                                        setState(() {getData(foodName);});
-                                        },
-                                         decoration: const InputDecoration(
-                                        hintText: 'Enter any food name' ,
-                                         hintStyle: TextStyle(color: Colors.white70),
-                                         disabledBorder:InputBorder.none,
-                                             focusedBorder: InputBorder.none,
-                                           ),
-
-                                        ),
-                                                       ),
-                                      )
-                                    ],
-                                  ),
+                children: [
+                  //Srearch bar suru
+                  Container(
+                    width: MediaQuery.of(context).size.width * .9,
+                    height: MediaQuery.of(context).size.height * .07,
+                    margin: const EdgeInsets.fromLTRB(15, 20, 15, 0),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(35),
+                        color: Colors.white24),
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 15),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          InkWell(
+                            child:
+                                const Icon(Icons.search, color: Colors.white70),
+                            onTap: () {
+                              getData(foodname.text.toString());
+                            },
+                          ),
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * .75,
+                            height: MediaQuery.of(context).size.height * .06,
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 5),
+                              child: TextField(
+                                controller: foodname,
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: "pop_medium"),
+                                cursorColor: Colors.white70,
+                                textInputAction: TextInputAction.search,
+                                onSubmitted: (value) {
+                                  getData(foodname.text.toString());
+                                  print("Controller:${foodname.text}");
+                                },
+                                decoration: const InputDecoration(
+                                  hintText: 'Enter any food name',
+                                  hintStyle: TextStyle(color: Colors.white70),
+                                  disabledBorder: InputBorder.none,
+                                  focusedBorder: InputBorder.none,
                                 ),
                               ),
-                   //Search Bar ses
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                  //Search Bar ses
 
-                   //two Text suru
-                   Padding(
-                     padding: const EdgeInsets.fromLTRB(25,20,20,10),
-                     child: SizedBox(
-                       width: MediaQuery.of(context).size.width* 9 ,
-                       height:  MediaQuery.of(context).size.height*.45 ,
-                       child: Column(
-                         crossAxisAlignment: CrossAxisAlignment.start,
-                         children: [
-                           const Text("WHAT YOU WILL MAKE TODAY ? " , style: TextStyle( color: Colors.pink , fontFamily: "pop_bold" , fontSize: 35 ,),),
-                           Text("Lets make a $foodName dish today ! " ,style: TextStyle( color: Colors.pink , fontFamily: "pop_light" , fontSize: 18 ,))
-                         ],
-                       ),
-                     ),
-                   )
+                  //two Text suru
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(25, 20, 20, 10),
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width * 9,
+                      height: MediaQuery.of(context).size.height * .25,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "WHAT YOU WILL MAKE TODAY ? ",
+                            style: TextStyle(
+                              color: Colors.pink,
+                              fontFamily: "pop_bold",
+                              fontSize: 35,
+                            ),
+                          ),
+                          Text("Lets make a ${foodname.text} dish today ! ",
+                              style: const TextStyle(
+                                color: Colors.pink,
+                                fontFamily: "pop_light",
+                                fontSize: 18,
+                              )),
+                        ],
+                      ),
+                    ),
+                  ),
                   //two Text ses
-
-
-
-
-
+                  ListView.builder(
+                      physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: recipiList.length,
+                      itemBuilder: (context, index) {
+                        return InkWell(
+                          onTap: () {
+                            print("tapping");
+                          },
+                          child: Card(
+                              margin: const EdgeInsets.only(
+                                  left: 15, right: 15, bottom: 5, top: 10),
+                              elevation: 5,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10)),
+                              child: Stack(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.network(
+                                      recipiList[index].appImgUrl,
+                                      filterQuality: FilterQuality.low,
+                                      fit: BoxFit.cover,
+                                      height: 150,
+                                      width: double.infinity,
+                                    ),
+                                  ),
+                                  Positioned(
+                                    left: 0,
+                                    bottom: 0,
+                                    child: Container(
+                                      width: MediaQuery.of(context).size.width,
+                                      decoration: const BoxDecoration(
+                                          color: Colors.black45),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          recipiList[index].appLabel,
+                                          style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Positioned(
+                                      top: 0,
+                                      right: 0,
+                                      child: Container(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                .25,
+                                        decoration: const BoxDecoration(
+                                            color: Colors.black45),
+                                        child: Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 6),
+                                            child: Row(
+                                              children: [
+                                                const Icon(
+                                                    Icons.local_fire_department,
+                                                    color: Colors.deepOrange),
+                                                Text(
+                                                  recipiList[index]
+                                                      .appCalories
+                                                      .toString()
+                                                      .substring(0, 6),
+                                                  style: const TextStyle(
+                                                      color: Colors.amberAccent,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ],
+                                            )),
+                                      ))
+                                ],
+                              )),
+                        );
+                      })
                 ],
-              )
-                ),
-              ]
-                  ) ,
-            );
-
+              ),
+            )),
+      ]),
+    );
   }
 }

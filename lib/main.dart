@@ -1,9 +1,27 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:untitled/LoginPage.dart';
+import 'package:untitled/signUpPage.dart';
 
 import 'Home.dart';
+import 'SplashScreen.dart';
+import 'firebase_options.dart';
 
-void main() {
-  runApp(const MaterialApp(home:Home(),debugShowCheckedModeBanner: false,), );
+Future<void> main() async {
+  //Initilized Firebase
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(
+    MaterialApp(
+      home: const SplashScreen(),
+      routes: {
+        "/signUpPage": (context) => const signUp(),
+        "/logInPage": (context) => const loginPage(),
+        "/afterLogIn": (context) => const Home(),
+      },
+      debugShowCheckedModeBanner: false,
+    ),
+  );
 }
-
-
