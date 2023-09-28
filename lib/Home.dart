@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart';
 import 'package:untitled/model.dart';
 
@@ -13,6 +14,9 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  // static final api_key = dotenv.env['api_key'];
+  String api_key = dotenv.get("api_key", fallback: "dfsg");
+
   int count = 0;
   List<RecipieModel> recipiList = <RecipieModel>[];
   FirebaseAuth _auth = FirebaseAuth.instance;
@@ -21,10 +25,13 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     Future<void> getData(String foodName) async {
+      String api_key = dotenv.get("api_key", fallback: "");
+      String app_id = dotenv.get("app_id", fallback: "");
+
       recipiList.clear();
       try {
         String url =
-            await "https://api.edamam.com/search?q=$foodName&app_id=86af4909&app_key=d204e8dc294ab499bef1fbfa892b4561";
+            await "https://api.edamam.com/search?q=$foodName&app_id=$app_id&app_key=$api_key";
         var response = await get(Uri.parse(url));
         var respondata = json.decode(response.body);
 
@@ -43,14 +50,6 @@ class _HomeState extends State<Home> {
       }
     }
 
-    @override
-    void initState() {
-      // TODO: implement initState
-      super.initState();
-      // getRecipes("Ladoo");
-    }
-
-    print("SetState2");
     return Scaffold(
       appBar: AppBar(
         title: const Text("Home"),

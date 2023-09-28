@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:untitled/LoginPage.dart';
 import 'package:untitled/signUpPage.dart';
 
@@ -7,7 +8,9 @@ import 'Home.dart';
 import 'SplashScreen.dart';
 import 'firebase_options.dart';
 
-Future<void> main() async {
+Future main() async {
+  // Or with fallback.
+  await dotenv.load(fileName: ".env");
   //Initilized Firebase
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
