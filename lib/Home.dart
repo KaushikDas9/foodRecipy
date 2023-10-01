@@ -6,6 +6,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart';
 import 'package:untitled/model.dart';
 
+import 'WebViewPage.dart';
+
 class Home extends StatefulWidget {
   const Home({super.key});
 
@@ -123,16 +125,17 @@ class _HomeState extends State<Home> {
 
                   //two Text suru
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(25, 20, 20, 10),
+                    padding: const EdgeInsets.fromLTRB(25, 20, 20, 0),
                     child: SizedBox(
                       width: MediaQuery.of(context).size.width * 9,
-                      height: MediaQuery.of(context).size.height * .25,
+                      height: MediaQuery.of(context).size.height * .20,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
                             "WHAT YOU WILL MAKE TODAY ? ",
                             style: TextStyle(
+                              // overflow: TextOverflow.ellipsis,
                               color: Colors.pink,
                               fontFamily: "pop_bold",
                               fontSize: 35,
@@ -157,6 +160,11 @@ class _HomeState extends State<Home> {
                         return InkWell(
                           onTap: () {
                             print("tapping");
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => webViewDesign(
+                                        recipiList[index].appUrl.toString())));
                           },
                           child: Card(
                               margin: const EdgeInsets.only(
