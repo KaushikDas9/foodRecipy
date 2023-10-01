@@ -92,7 +92,13 @@ class _HomeState extends State<Home> {
                             child:
                                 const Icon(Icons.search, color: Colors.white70),
                             onTap: () {
-                              getData(foodname.text.toString());
+                              if (foodname.text.toString() != " ") {
+                                setState(() {
+                                  isFoodSearched = true;
+                                  isNothingSearched = false;
+                                });
+                                getData(foodname.text.toString());
+                              }
                             },
                           ),
                           SizedBox(
@@ -175,9 +181,13 @@ class _HomeState extends State<Home> {
                   //two Text ses
                   Stack(
                     children: [
-                      Visibility(
-                        child: CircularProgressIndicator(),
-                        visible: isFoodSearched,
+                      Container(
+                        height: MediaQuery.of(context).size.height * .5,
+                        alignment: Alignment.center,
+                        child: Visibility(
+                          child: CircularProgressIndicator(),
+                          visible: isFoodSearched,
+                        ),
                       ),
                       ListView.builder(
                           physics: NeverScrollableScrollPhysics(),
