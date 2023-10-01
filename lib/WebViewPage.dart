@@ -19,7 +19,7 @@ class _webViewDesignState extends State<webViewDesign> {
   @override
   void initState() {
     // TODO: implement initState
-    print(widget.url.toString());
+    // print(widget.url.toString());
   }
 
   @override
