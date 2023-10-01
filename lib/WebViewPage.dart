@@ -19,11 +19,7 @@ class _webViewDesignState extends State<webViewDesign> {
   @override
   void initState() {
     // TODO: implement initState
-    super.initState();
-    a = widget.url;
-    if (a.contains("http")) {
-      a.replaceAll("http", "https");
-    }
+    print(widget.url.toString());
   }
 
   @override
@@ -61,7 +57,7 @@ class _webViewDesignState extends State<webViewDesign> {
               isloading = true;
             });
           },
-          initialUrlRequest: URLRequest(url: Uri.parse(a)),
+          initialUrlRequest: URLRequest(url: Uri.parse(widget.url)),
         ),
         Visibility(
           child: CircularProgressIndicator(),
