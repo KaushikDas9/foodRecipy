@@ -20,6 +20,8 @@ class _HomeState extends State<Home> {
   List<RecipieModel> recipiList = <RecipieModel>[];
   FirebaseAuth _auth = FirebaseAuth.instance;
   TextEditingController foodname = TextEditingController();
+  bool isNothingSearched = true;
+  bool isFoodSearched = false;
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +45,7 @@ class _HomeState extends State<Home> {
             recipieModel = RecipieModel.fromMap(element["recipe"]);
             recipiList.add(recipieModel);
           });
+          isFoodSearched = false;
         });
       } catch (e) {
         print(e.toString());
@@ -105,7 +108,13 @@ class _HomeState extends State<Home> {
                                 cursorColor: Colors.white70,
                                 textInputAction: TextInputAction.search,
                                 onSubmitted: (value) {
-                                  getData(foodname.text.toString());
+                                  if (value != null) {
+                                    setState(() {
+                                      isFoodSearched = true;
+                                      isNothingSearched = false;
+                                    });
+                                    getData(foodname.text.toString());
+                                  }
                                   print("Controller:${foodname.text}");
                                 },
                                 decoration: const InputDecoration(
@@ -141,102 +150,129 @@ class _HomeState extends State<Home> {
                               fontSize: 35,
                             ),
                           ),
-                          Text("Lets make a ${foodname.text} dish today ! ",
-                              style: const TextStyle(
-                                color: Colors.pink,
-                                fontFamily: "pop_light",
-                                fontSize: 18,
-                              )),
+                          Container(
+                            width: MediaQuery.of(context).size.width,
+                            alignment: Alignment.center,
+                            child: isNothingSearched
+                                ? const Text("Search What dish You Want!!",
+                                    style: TextStyle(
+                                        color: Colors.amberAccent,
+                                        fontFamily: "pop_light",
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold))
+                                : Text(
+                                    "Lets make a ${foodname.text} dish today ! ",
+                                    style: const TextStyle(
+                                        color: Colors.pink,
+                                        fontFamily: "pop_light",
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold)),
+                          ),
                         ],
                       ),
                     ),
                   ),
                   //two Text ses
-                  ListView.builder(
-                      physics: NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: recipiList.length,
-                      itemBuilder: (context, index) {
-                        return InkWell(
-                          onTap: () {
-                            print("tapping");
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => webViewDesign(
-                                        recipiList[index].appUrl.toString())));
-                          },
-                          child: Card(
-                              margin: const EdgeInsets.only(
-                                  left: 15, right: 15, bottom: 5, top: 10),
-                              elevation: 5,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10)),
-                              child: Stack(
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Image.network(
-                                      recipiList[index].appImgUrl,
-                                      filterQuality: FilterQuality.low,
-                                      fit: BoxFit.cover,
-                                      height: 150,
-                                      width: double.infinity,
-                                    ),
-                                  ),
-                                  Positioned(
-                                    left: 0,
-                                    bottom: 0,
-                                    child: Container(
-                                      width: MediaQuery.of(context).size.width,
-                                      decoration: const BoxDecoration(
-                                          color: Colors.black45),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          recipiList[index].appLabel,
-                                          style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold),
+                  Stack(
+                    children: [
+                      Visibility(
+                        child: CircularProgressIndicator(),
+                        visible: isFoodSearched,
+                      ),
+                      ListView.builder(
+                          physics: NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: recipiList.length,
+                          itemBuilder: (context, index) {
+                            return InkWell(
+                              onTap: () {
+                                print("tapping");
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => webViewDesign(
+                                            recipiList[index]
+                                                .appUrl
+                                                .toString())));
+                              },
+                              child: Card(
+                                  margin: const EdgeInsets.only(
+                                      left: 15, right: 15, bottom: 5, top: 10),
+                                  elevation: 5,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10)),
+                                  child: Stack(
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: Image.network(
+                                          recipiList[index].appImgUrl,
+                                          filterQuality: FilterQuality.low,
+                                          fit: BoxFit.cover,
+                                          height: 150,
+                                          width: double.infinity,
                                         ),
                                       ),
-                                    ),
-                                  ),
-                                  Positioned(
-                                      top: 0,
-                                      right: 0,
-                                      child: Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
+                                      Positioned(
+                                        left: 0,
+                                        bottom: 0,
+                                        child: Container(
+                                          width:
+                                              MediaQuery.of(context).size.width,
+                                          decoration: const BoxDecoration(
+                                              color: Colors.black45),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                              recipiList[index].appLabel,
+                                              style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Positioned(
+                                          top: 0,
+                                          right: 0,
+                                          child: Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
                                                 .25,
-                                        decoration: const BoxDecoration(
-                                            color: Colors.black45),
-                                        child: Padding(
-                                            padding:
-                                                const EdgeInsets.only(left: 6),
-                                            child: Row(
-                                              children: [
-                                                const Icon(
-                                                    Icons.local_fire_department,
-                                                    color: Colors.deepOrange),
-                                                Text(
-                                                  recipiList[index]
-                                                      .appCalories
-                                                      .toString()
-                                                      .substring(0, 6),
-                                                  style: const TextStyle(
-                                                      color: Colors.amberAccent,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                              ],
-                                            )),
-                                      ))
-                                ],
-                              )),
-                        );
-                      })
+                                            decoration: const BoxDecoration(
+                                                color: Colors.black45),
+                                            child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 6),
+                                                child: Row(
+                                                  children: [
+                                                    const Icon(
+                                                        Icons
+                                                            .local_fire_department,
+                                                        color:
+                                                            Colors.deepOrange),
+                                                    Text(
+                                                      recipiList[index]
+                                                          .appCalories
+                                                          .toString()
+                                                          .substring(0, 6),
+                                                      style: const TextStyle(
+                                                          color: Colors
+                                                              .amberAccent,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                  ],
+                                                )),
+                                          ))
+                                    ],
+                                  )),
+                            );
+                          })
+                    ],
+                  )
                 ],
               ),
             )),
